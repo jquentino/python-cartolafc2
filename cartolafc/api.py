@@ -123,7 +123,7 @@ class Api(object):
         else:
             return self._atletas_pontuados(rodada)
 
-    def parciais(self) -> Dict[int, Atleta]:
+    def parciais(self) -> List[Atleta]:
         """Obtém um mapa com todos os atletas que já pontuaram na rodada atual (aberta).
 
         Returns:
