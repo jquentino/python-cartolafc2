@@ -99,6 +99,30 @@ class Api(object):
         }
         return [Atleta.from_dict(atleta, clubes=clubes) for atleta in data["atletas"]]
 
+    def resultados(self, rodada: int) -> List[Atleta]:
+        """Retorna uma lista com os atletas que pontuaram na rodada informada.
+        
+        Args:
+            rodada (int): numero da rodada 
+
+        Returns:
+            Lista com desempenho dos atletas na rodada
+        """
+        rodada_atual = self.mercado().rodada_atual
+        status_mercado = self.mercado().status.id
+
+        if rodada > rodada_atual:
+            raise CartolaFCError(
+                "A rodada informada ainda não aconteceu."
+            )
+        elif rodada == rodada_atual and status_mercado == MERCADO_FECHADO:
+            raise CartolaFCError(
+                "A rodada informada ainda não foi finalizada, para consultar os resultados parciais, "
+                "utilize o metodo parciais."
+            )
+        else:
+            return self._atletas_pontuados(rodada)
+
     def parciais(self) -> Dict[int, Atleta]:
         """Obtém um mapa com todos os atletas que já pontuaram na rodada atual (aberta).
 
@@ -110,18 +134,7 @@ class Api(object):
         """
 
         if self.mercado().status.id == MERCADO_FECHADO:
-            url = f"{self._api_url}/atletas/pontuados"
-            data = self._request(url)
-            clubes = {
-                clube["id"]: Clube.from_dict(clube) for clube in data["clubes"].values()
-            }
-            return {
-                int(atleta_id): Atleta.from_dict(
-                    atleta, clubes=clubes, atleta_id=int(atleta_id)
-                )
-                for atleta_id, atleta in data["atletas"].items()
-                if atleta["clube_id"] > 0
-            }
+            return self._atletas_pontuados()
 
         raise CartolaFCError(
             "As pontuações parciais só ficam disponíveis com o mercado fechado."
@@ -263,3 +276,19 @@ class Api(object):
                 attempts -= 1
                 if not attempts:
                     raise error
+    
+    def _atletas_pontuados(self, rodada: Optional[int] = None) -> List[Atleta]:
+        url = f"{self._api_url}/atletas/pontuados"
+        if rodada:
+            url += f"/{rodada}"
+        data = self._request(url)
+        clubes = {
+            clube["id"]: Clube.from_dict(clube) for clube in data["clubes"].values()
+        }
+        return [
+            Atleta.from_dict(
+                atleta, clubes=clubes, atleta_id=int(atleta_id)
+            )
+            for atleta_id, atleta in data["atletas"].items()
+            if atleta["clube_id"] > 0
+            ]
