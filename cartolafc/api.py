@@ -115,9 +115,9 @@ class Api(object):
         rodada_atual = self.mercado().rodada_atual
         status_mercado = self.mercado().status.id
 
-        if rodada > rodada_atual:
+        if rodada < 1 or rodada > rodada_atual:
             raise CartolaFCError(
-                "A rodada informada ainda não aconteceu."
+                "A rodada informada não é válido ou ainda não aconteceu."
             )
         elif rodada == rodada_atual and status_mercado == MERCADO_FECHADO:
             raise CartolaFCError(
