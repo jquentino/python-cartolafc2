@@ -105,7 +105,8 @@ class Atleta(BaseModel):
         clube: Clube,
         status_id: Optional[int] = None,
         is_capitao: Optional[bool] = None,
-        preco: Optional[float] = None
+        preco: Optional[float] = None,
+        entrou_em_campo: Optional[bool] = None
     ) -> None:
         self.id = atleta_id
         self.apelido = apelido
@@ -116,6 +117,7 @@ class Atleta(BaseModel):
         self.status = _atleta_status[status_id] if status_id else None
         self.is_capitao = is_capitao
         self.preco = preco
+        self.entrou_em_campo = entrou_em_campo
 
     @classmethod
     def from_dict(
@@ -140,7 +142,8 @@ class Atleta(BaseModel):
             clube,
             data.get("status_id", None),
             is_capitao,
-            data.get("preco_num", None)
+            data.get("preco_num", None),
+            data["entrou_em_campo"]
         )
 
 
