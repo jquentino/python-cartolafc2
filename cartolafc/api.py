@@ -99,7 +99,7 @@ class Api(object):
         }
         return [Atleta.from_dict(atleta, clubes=clubes) for atleta in data["atletas"]]
 
-    def resultados(self, rodada: int) -> List[Atleta]:
+    def resultados(self, rodada: int) -> Dict[int, Atleta]:
         """Retorna uma lista com os atletas que pontuaram na rodada informada.
         
         Args:
@@ -123,7 +123,7 @@ class Api(object):
         else:
             return self._atletas_pontuados(rodada)
 
-    def parciais(self) -> List[Atleta]:
+    def parciais(self) -> Dict[int, Atleta]:
         """Obtém um mapa com todos os atletas que já pontuaram na rodada atual (aberta).
 
         Returns:
@@ -277,7 +277,7 @@ class Api(object):
                 if not attempts:
                     raise error
     
-    def _atletas_pontuados(self, rodada: Optional[int] = None) -> List[Atleta]:
+    def _atletas_pontuados(self, rodada: Optional[int] = None) -> Dict[int, Atleta]:
         url = f"{self._api_url}/atletas/pontuados"
         if rodada:
             url += f"/{rodada}"
@@ -285,10 +285,10 @@ class Api(object):
         clubes = {
             clube["id"]: Clube.from_dict(clube) for clube in data["clubes"].values()
         }
-        return [
-            Atleta.from_dict(
-                atleta, clubes=clubes, atleta_id=int(atleta_id)
-            )
+        return {
+                int(atleta_id): Atleta.from_dict(
+                    atleta, clubes=clubes, atleta_id=int(atleta_id)
+                )
             for atleta_id, atleta in data["atletas"].items()
             if atleta["clube_id"] > 0
-            ]
+        }
