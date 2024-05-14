@@ -99,14 +99,18 @@ class Api(object):
         }
         return [Atleta.from_dict(atleta, clubes=clubes) for atleta in data["atletas"]]
 
-    def resultados(self, rodada: int) -> Dict[int, Atleta]:
-        """Retorna uma lista com os atletas que pontuaram na rodada informada.
+    def resultados_atletas(self, rodada: int) -> Dict[int, Atleta]:
+        """Obtém um mapa com todos os atletas que pontuaram na rodada informada.
         
         Args:
             rodada (int): numero da rodada 
 
         Returns:
-            Lista com desempenho dos atletas na rodada
+            Uma mapa, onde a key é um inteiro representando o id do atleta e o valor é uma instância de cartolafc.Atleta
+        
+        Raises:
+            CartolaFCError: Se a rodada informada estiver com o status fechado ou se a rodada informada não existe.
+        
         """
         rodada_atual = self.mercado().rodada_atual
         status_mercado = self.mercado().status.id
@@ -130,7 +134,7 @@ class Api(object):
             Uma mapa, onde a key é um inteiro representando o id do atleta e o valor é uma instância de cartolafc.Atleta
 
         Raises:
-            CartolaFCError: Se o mercado atual estiver com o status fechado.
+            CartolaFCError: Se o mercado atual estiver com o status aberto.
         """
 
         if self.mercado().status.id == MERCADO_FECHADO:
