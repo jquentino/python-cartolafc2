@@ -123,7 +123,7 @@ class Atleta(BaseModel):
         data: dict,
         clubes: Dict[int, Clube],
         atleta_id: Optional[int] = None,
-        is_capitao: Optional[bool] = None,
+        is_capitao: Optional[bool] = None
     ) -> "Atleta":
         atleta_id = atleta_id if atleta_id else data["atleta_id"]
         pontos = data["pontos_num"] if "pontos_num" in data else data["pontuacao"]
